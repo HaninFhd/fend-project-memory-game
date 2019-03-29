@@ -1,3 +1,4 @@
+"use strict";
 let moves = 0;
 let stars = 3;
 let correctCards = 0;
@@ -9,8 +10,10 @@ let totalSeconds = 0;
 let hour = 0;
 let minute = 0;
 let seconds = 0;
+let clikToStart = true;
+let timerVar;
 // timer source code https://stackoverflow.com/questions/5517597/plain-count-up-timer-in-javascript
-let timerVar = setInterval(countTimer, 1000);
+
 init();
 
 function countTimer() {
@@ -19,12 +22,13 @@ function countTimer() {
 	minute = Math.floor((totalSeconds - hour * 3600) / 60);
 	seconds = totalSeconds - (hour * 3600 + minute * 60);
 
-	function pad(val) {
-		return val > 9 ? val : "0" + val;
-	}
 	document.getElementById("seconds").innerHTML = pad(seconds);
 	document.getElementById("minutes").innerHTML = pad(minute);
 	document.getElementById("hours").innerHTML = pad(hour);
+}
+
+function pad(val) {
+    return val > 9 ? val : "0" + val;
 }
 // Shuffle function from http://stackoverflow.com/a/2450976
 function shuffle(array) {
@@ -46,7 +50,7 @@ function init() {
 	let ulList = document.getElementsByClassName('deck')[0];
 	let elements = document.getElementsByClassName('card');
 	for (let i = 0; i < elements.length; i++) {
-		cards.push(elements[i])
+        cards.push(elements[i]);
 	}
 	cards = shuffle(cards);
 	let i = 0;
@@ -81,10 +85,11 @@ function updatemoves() {
 }
 
 function reset() {
+    //clear firstClick to starting the timer when the first card is flipped.
+    clikToStart = true;
 	//clear timer
 	totalSeconds = 0;
 	clearInterval(timerVar);
-	timerVar = setInterval(countTimer, 1000);
 	document.getElementById("seconds").innerHTML = '00';
 	document.getElementById("minutes").innerHTML = '00';
 	document.getElementById("hours").innerHTML = '00';
@@ -99,22 +104,30 @@ function reset() {
 }
 
 function cardclicked(card) {
+
+    if (clikToStart) {
+        timerVar = setInterval(countTimer, 1000);
+        clikToStart = false;
+    }
+
 	let className = card.getAttribute('class');
-	if (className != "card match") {
-		updatemoves();
+    if (className != "card match") {
+		
 		switch (openedCards.length) {
 			case 0:
 				// code block
-				if (className != "card open show" && className != "card match") {
+                if (className != "card open show" && className != "card match") {
 					openedCards.push(card);
-					card.className = 'card open show';
+                    card.className = 'card open show';
+                    updatemoves();
 				}
 				break;
 			case 1:
 				// check if clicked card is the same card
 				if (card != openedCards[0]) {
 					openedCards.push(card);
-					card.className = 'card open show';
+                    card.className = 'card open show';
+                    updatemoves();
 					card1 = openedCards[0].children[0].className;
 					card2 = openedCards[1].children[0].className;
 					if (card1 == card2) {
@@ -155,7 +168,6 @@ function checkWin() {
 }
 
 function playAgain() {
-	console.log("play again clicked");
 	reset();
 	let popup = document.getElementsByClassName('popup')[0];
 	popup.style.display = "none";
