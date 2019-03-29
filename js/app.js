@@ -98,9 +98,10 @@ function reset() {
 	moves = 0;
 	document.getElementsByClassName("fa-star")[0].style.display = "";
 	document.getElementsByClassName("fa-star")[1].style.display = "";
-	document.getElementsByClassName("fa-star")[2].style.display = "";
+    document.getElementsByClassName("fa-star")[2].style.display = "";
+    openedCards = [];
 	correctCards = 0;
-	init();
+    init();
 }
 
 function cardclicked(card) {
