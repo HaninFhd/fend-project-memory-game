@@ -1,29 +1,24 @@
-/*
- * Create a list that holds all of your cards
- */
-/*
- * Display the cards on the page
- *   - shuffle the list of cards using the provided "shuffle" method below
- *   - loop through each card and create its HTML
- *   - add each card's HTML to the page
- */
 let moves = 0;
-let correctCards =0;
+let stars = 3;
+let correctCards = 0;
 let openedCards = [];
 let card1, card2;
 let card1Parent = '';
 let card2Parent = '';
-
+let totalSeconds = 0;
+let hour = 0;
+let minute = 0;
+let seconds = 0;
 // timer source code https://stackoverflow.com/questions/5517597/plain-count-up-timer-in-javascript
 let timerVar = setInterval(countTimer, 1000);
-let totalSeconds = 0;
 init();
-confirm(" play again ? ");
+
 function countTimer() {
 	++totalSeconds;
-	let hour = Math.floor(totalSeconds / 3600);
-	let minute = Math.floor((totalSeconds - hour * 3600) / 60);
-	let seconds = totalSeconds - (hour * 3600 + minute * 60);
+	hour = Math.floor(totalSeconds / 3600);
+	minute = Math.floor((totalSeconds - hour * 3600) / 60);
+	seconds = totalSeconds - (hour * 3600 + minute * 60);
+
 	function pad(val) {
 		return val > 9 ? val : "0" + val;
 	}
@@ -46,6 +41,7 @@ function shuffle(array) {
 }
 
 function init() {
+	document.getElementsByClassName("moves")[0].innerHTML = moves;
 	let cards = [];
 	let ulList = document.getElementsByClassName('deck')[0];
 	let elements = document.getElementsByClassName('card');
@@ -70,35 +66,41 @@ function init() {
 function updatemoves() {
 	moves++;
 	document.getElementsByClassName("moves")[0].innerHTML = moves;
-	if (moves > 5) {
+	if (moves > 15) {
 		document.getElementsByClassName("fa-star")[0].style.display = "none";
+		stars = 2;
 	}
-	if (moves > 10) {
+	if (moves > 35) {
 		document.getElementsByClassName("fa-star")[1].style.display = "none";
+		stars = 1;
 	}
-	if (moves > 20) {
+	if (moves > 50) {
 		document.getElementsByClassName("fa-star")[2].style.display = "none";
+		stars = 0;
 	}
 }
 
 function reset() {
 	//clear timer
-	sec = 0;
-	document.getElementById("seconds").innerHTML = "";
-	document.getElementById("minutes").innerHTML = "";
+	totalSeconds = 0;
+	clearInterval(timerVar);
+	timerVar = setInterval(countTimer, 1000);
+	document.getElementById("seconds").innerHTML = '00';
+	document.getElementById("minutes").innerHTML = '00';
+	document.getElementById("hours").innerHTML = '00';
 	//clear moves and stars
+	stars = 3;
 	moves = 0;
-	document.getElementsByClassName("moves")[0].innerHTML = moves;
 	document.getElementsByClassName("fa-star")[0].style.display = "";
 	document.getElementsByClassName("fa-star")[1].style.display = "";
 	document.getElementsByClassName("fa-star")[2].style.display = "";
+	correctCards = 0;
 	init();
 }
 
 function cardclicked(card) {
 	let className = card.getAttribute('class');
 	if (className != "card match") {
-		
 		updatemoves();
 		switch (openedCards.length) {
 			case 0:
@@ -107,56 +109,54 @@ function cardclicked(card) {
 					openedCards.push(card);
 					card.className = 'card open show';
 				}
-			break;
+				break;
 			case 1:
 				// check if clicked card is the same card
-				if(card != openedCards[0]){
-				openedCards.push(card);
-				card.className = 'card open show';
-				card1 = openedCards[0].children[0].className;
-				card2 = openedCards[1].children[0].className;
-				if (card1 == card2) {
-					openedCards[0].className = "card match";
-					openedCards[1].className = "card match";
-					openedCards = [];
-					correctCards+=2;
-					checkWin();
-				} else {
-					card1Parent = openedCards[0];
-					card2Parent = openedCards[1];
-					card1Parent.className = "card fail";
-					card2Parent.className = "card fail";
-					setTimeout(function() {
-						card1Parent.className = "card";
-						card2Parent.className = "card";
-					}, 1300);
-					openedCards = [];
+				if (card != openedCards[0]) {
+					openedCards.push(card);
+					card.className = 'card open show';
+					card1 = openedCards[0].children[0].className;
+					card2 = openedCards[1].children[0].className;
+					if (card1 == card2) {
+						openedCards[0].className = "card match";
+						openedCards[1].className = "card match";
+						openedCards = [];
+						correctCards += 2;
+						checkWin();
+					} else {
+						card1Parent = openedCards[0];
+						card2Parent = openedCards[1];
+						card1Parent.className = "card fail";
+						card2Parent.className = "card fail";
+						setTimeout(function() {
+							card1Parent.className = "card";
+							card2Parent.className = "card";
+						}, 500);
+						openedCards = [];
+					}
 				}
-				}
-			break;
+				break;
 		}
 	}
 }
-function checkWin(){
- console.log(correctCards);
-if(correctCards==16){
 
-	console.log("win");
-	
-	if (confirm(" play again ? ")) {
-    console.log("play again");
-  } else {
-   
-  }
+function checkWin() {
+	if (correctCards == 16) {
+		// Get the modal
+		let popup = document.getElementsByClassName('popup')[0];
+		popup.style.display = "block";
+		let result = document.getElementsByClassName('result')[0];
+		let message = `with ${moves} moves AND ${stars} Stars.
+
+		in ${hour}:${minute}:${seconds}`;
+		result.innerHTML = message;
+		clearInterval(timerVar);
+	}
 }
+
+function playAgain() {
+	console.log("play again clicked");
+	reset();
+	let popup = document.getElementsByClassName('popup')[0];
+	popup.style.display = "none";
 }
-/*
- * set up the event listener for a card. If a card is clicked:
- *  - display the card's symbol (put this functionality in another function that you call from this one)
- *  - add the card to a *list* of "open" cards (put this functionality in another function that you call from this one)
- *  - if the list already has another card, check to see if the two cards match
- *    + if the cards do match, lock the cards in the open position (put this functionality in another function that you call from this one)
- *    + if the cards do not match, remove the cards from the list and hide the card's symbol (put this functionality in another function that you call from this one)
- *    + increment the move counter and display it on the page (put this functionality in another function that you call from this one)
- *    + if all cards have matched, display a message with the final score (put this functionality in another function that you call from this one)
- */

@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
-
     <div class="container">
         <header>
             <h1>Matching Game</h1>
@@ -21,10 +20,8 @@
         		<li><i class="fa fa-star"></i></li>
         		<li><i class="fa fa-star"></i></li>
         	</ul>
-
         	<span class="moves" id="moves">3</span> Moves
 			<span id="hours">00</span>:<span id="minutes">00</span>:<span id="seconds">00</span>
-	
             <div class="restart" onclick="reset()">
         		<i class="fa fa-repeat"></i>
         	</div>
@@ -81,6 +78,19 @@
             </li>
         </ul>
     </div>
+	
+<!-- The popup -->
+<div class="popup">
+  <!-- popup content -->
+  <div class="popup-content">
+	<div class="block">
+		<img alt="done" class="img" src="img/done.png">
+	</div>
+    <strong>congratulations..you won</strong>
+	<p class="result"> with ... moves AND ... stars.</p>
+	<button class="play" onclick="playAgain()"> play again </button>
+  </div>
+</div>
 
     <script src="js/app.js"></script>
 </body>
